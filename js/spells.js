@@ -60,7 +60,7 @@ export function resolve(words) {
   const baseEffect = base ? base.effect.toLowerCase().replace(/^(an?|the) /, '') : `${S[0].adj} ${F[0].noun}`;
   return { ok: true, kind: 'combo', id: key(words), name: `${m.id} ${baseName}`,
            effect: cap(`${m.adj} ${baseEffect}`) + ` (${m.note.toLowerCase()})`,
-           hpCost: base?.hpCost || 0, cost: m.rare ? cost + 25 : cost, words, color: S[0].color };
+           hpCost: base?.hpCost || 0, cost: m.rare ? cost + 25 : m.id === 'Minu' ? cost - 12 : cost, words, color: S[0].color };
 }
 
 function sourceColor(roots) {
