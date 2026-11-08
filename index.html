@@ -3,61 +3,417 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#14111f">
+  <meta name="theme-color" content="#0B0910">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Spell Game</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&amp;family=IBM+Plex+Mono:wght@400;600&amp;family=Cinzel+Decorative:wght@700&amp;family=Cinzel:wght@600;700&amp;family=IM+Fell+English:ital@0;1&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/shell.css">
+  <link rel="stylesheet" href="css/primary.css">
 </head>
 <body>
-  <header class="hud">
-    <div class="bar"><span>Mana</span><div class="meter"><i id="mana"></i></div><b id="manaNum">100</b></div>
-    <div class="bar"><span>Health</span><div class="meter hp"><i id="hp"></i></div><b id="hpNum">100</b></div>
-    <div class="chips" id="playerChips"></div>
-  </header>
+  <!-- The game is laid out on a 390 × 844 phone frame and scaled to fit the screen. -->
+  <div id="fit"><div id="frame"></div></div>
 
-  <main class="stage" id="stage">
-    <div class="foe">
-      <div class="foe-head"><b id="foeName">Enemy</b><span id="foeLevel"></span></div>
-      <div class="meter foe-hp"><i id="foeHp"></i></div>
-      <div class="foe-meta"><span id="foeWeak"></span><span id="foeHpNum"></span></div>
-      <div class="chips" id="foeChips"></div>
-    </div>
-    <div class="arena">
-      <div class="target" id="target" aria-hidden="true"></div>
-      <div class="burst" id="burst"></div>
-      <div class="floats" id="floats"></div>
-    </div>
-    <div class="intent"><span id="intentText"></span><div class="meter"><i id="intent"></i></div></div>
-    <div class="overlay" id="overlay" hidden>
-      <p class="title" id="overlayTitle"></p>
-      <p class="sub" id="overlaySub"></p>
-      <button class="cast" id="overlayBtn">Try again</button>
-    </div>
-    <div class="result" id="result">
-      <p class="title">Tap runes to build a spell</p>
-      <p class="sub">1 to 3 words, in any order. Then cast.</p>
-    </div>
-  </main>
+  <!-- Primary screen markup. Syntax: see js/dc-lite.js. Logic: screens/primary.js -->
+  <template id="primary">
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; background: #0B0910; color: #EDE8F5; font-family: 'IBM Plex Mono', monospace; display: flex; flex-direction: column; gap: 12px; padding: 8px 16px; overflow: hidden">
 
-  <section class="spellbar">
-    <div class="slots" id="slots"></div>
-    <div class="actions">
-      <button id="clear" class="ghost">Clear</button>
-      <button id="cast" class="cast" disabled>Cast</button>
+  <button type="button" class="press" onClick="{{nextLoc}}" aria-label="Current location. Tap to preview another region." style="height: 196px; flex: 0 0 auto; box-sizing: border-box; text-align: left; background: #15121C; border: 1px solid #2E2838; border-radius: 20px; padding: 16px 18px; color: #EDE8F5; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 0 #07050B">
+    <span style="display: flex; justify-content: space-between; align-items: center; width: 100%">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: 2px; color: #0B0910; background: {{accent}}; border-radius: 8px; padding: 4px 9px">DAY {{day}}</span>
+      <span style="display: flex; align-items: center; gap: 8px">
+        <sc-if value="{{isNight}}" hint-placeholder-val="{{ false }}">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4B5FD" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg>
+        </sc-if>
+        <sc-if value="{{isDay}}" hint-placeholder-val="{{ true }}">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F5B544" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"></path></svg>
+        </sc-if>
+        <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 24px; font-weight: 700">{{time}}</span>
+        <span style="font-size: 12px; color: #A39CB2">{{ampm}}</span>
+      </span>
+    </span>
+    <span style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: 0.3px">{{place}}</span>
+      <span style="display: flex; align-items: baseline; gap: 10px">
+        <span style="font-size: 15px; font-weight: 600; color: {{accent}}">• {{region}}</span>
+        <span style="font-size: 11px; color: #A39CB2">Region {{regionNum}} of 7</span>
+      </span>
+    </span>
+    <span style="display: flex; flex-direction: column; gap: 6px; width: 100%">
+      <span style="position: relative; display: block; height: 8px; background: #241F2E; border-radius: 4px">
+        <span style="{{dayFill}}"></span>
+        <span style="{{dayMarker}}"></span>
+      </span>
+      <span style="display: flex; justify-content: space-between; font-size: 11px; color: #8A8396"><span>{{phase}}</span><span>{{topHint}}</span></span>
+    </span>
+  </button>
+
+  <div style="position: relative; height: 422px; flex: 0 0 auto; border-radius: 22px; overflow: hidden; border: 1px solid #2E2838">
+    <div style="position: absolute; left: 0; top: 0; width: 100%; height: 340px; display: flex; flex-direction: column">
+      <sc-for list="{{sky}}" as="b" hint-placeholder-count="5">
+        <div style="{{b.s}}"></div>
+      </sc-for>
     </div>
-    <div class="cast-progress"><i id="castProgress"></i></div>
-  </section>
+    <div class="{{shapesClass}}" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%">
+      <sc-for list="{{shapes}}" as="sh" hint-placeholder-count="6">
+        <div class="{{sh.c}}" style="{{sh.s}}"></div>
+      </sc-for>
+    </div>
+    <div style="{{groundEdge}}"></div>
+    <div style="{{ground}}"></div>
+    <sc-if value="{{isTraveling}}" hint-placeholder-val="{{ false }}">
+      <div class="tufts" style="position: absolute; left: 0; top: 352px; width: 440px; height: 60px">
+        <sc-for list="{{tufts}}" as="t" hint-placeholder-count="11">
+          <div style="{{t.s}}"></div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <div style="position: absolute; left: 109px; top: 330px; width: 140px; height: 16px; border-radius: 50%; background: rgba(0,0,0,0.38)"></div>
+    <div class="{{spriteClass}}" role="img" aria-label="Your character, front view, in equipped armor" style="position: absolute; left: 79px; top: 50px; display: grid; grid-template-columns: repeat(20, 10px); grid-auto-rows: 10px">
+      <sc-for list="{{pixels}}" as="p" hint-placeholder-count="580">
+        <div style="{{p.s}}"></div>
+      </sc-for>
+    </div>
+    <sc-for list="{{props}}" as="pr" hint-placeholder-count="0">
+      <div class="{{pr.c}}" style="{{pr.s}}"></div>
+    </sc-for>
 
-  <nav class="tabs" id="tabs">
-    <button data-tab="S" class="on">Sources</button>
-    <button data-tab="F">Forms</button>
-    <button data-tab="M">Modifiers</button>
-    <button data-tab="G">Grimoire <span id="found">0</span></button>
-  </nav>
+    <button type="button" class="press" onClick="{{openBag}}" aria-label="Inventory" style="position: absolute; left: 12px; top: 16px; width: 62px; height: 68px; border-radius: 16px; border: 1px solid rgba(245,181,68,0.55); background: rgba(11,9,16,0.78); box-shadow: 0 4px 0 rgba(0,0,0,0.55); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #F5B544; padding: 0">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F5B544" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14l-1.2 11H6.2z"></path><path d="M9 9V7a3 3 0 0 1 6 0v2"></path><path d="M9.5 13.5h5"></path></svg>
+      <span style="font-size: 10px; font-weight: 600; letter-spacing: 1px">BAG</span>
+      <span style="position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; border-radius: 50%; background: #F2546B; border: 2px solid #0B0910"></span>
+    </button>
+    <button type="button" class="press" onClick="{{openGear}}" aria-label="Equipment" style="position: absolute; left: 12px; top: 96px; width: 62px; height: 68px; border-radius: 16px; border: 1px solid rgba(125,211,252,0.55); background: rgba(11,9,16,0.78); box-shadow: 0 4px 0 rgba(0,0,0,0.55); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #7DD3FC; padding: 0">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7DD3FC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 16a7 7 0 0 1 14 0v4H5z"></path><path d="M12 3v6"></path><path d="M8.5 16h7"></path><path d="M12 16v4"></path></svg>
+      <span style="font-size: 10px; font-weight: 600; letter-spacing: 1px">GEAR</span>
+    </button>
+    <button type="button" class="press" onClick="{{openStats}}" aria-label="Character stats" style="position: absolute; right: 12px; top: 16px; width: 62px; height: 68px; border-radius: 16px; border: 1px solid rgba(74,222,128,0.55); background: rgba(11,9,16,0.78); box-shadow: 0 4px 0 rgba(0,0,0,0.55); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #4ADE80; padding: 0">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7.8 4.5v9L12 21l-7.8-4.5v-9z"></path><path d="M12 8l3.5 2v4L12 16l-3.5-2v-4z"></path></svg>
+      <span style="font-size: 10px; font-weight: 600; letter-spacing: 1px">STATS</span>
+    </button>
+    <button type="button" class="press" onClick="{{openQuests}}" aria-label="Quests, 2 new" style="position: absolute; right: 12px; top: 96px; width: 62px; height: 68px; border-radius: 16px; border: 1px solid rgba(167,139,250,0.55); background: rgba(11,9,16,0.78); box-shadow: 0 4px 0 rgba(0,0,0,0.55); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #A78BFA; padding: 0">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h6a3 3 0 0 1 3 3v12a2.5 2.5 0 0 0-2.5-2.5H3z"></path><path d="M21 5h-6a3 3 0 0 0-3 3v12a2.5 2.5 0 0 1 2.5-2.5H21z"></path></svg>
+      <span style="font-size: 10px; font-weight: 600; letter-spacing: 1px">QUESTS</span>
+      <span style="position: absolute; top: -6px; right: -6px; min-width: 20px; height: 20px; border-radius: 10px; background: #F2546B; color: #1A0A0E; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #0B0910">2</span>
+    </button>
+  </div>
 
-  <section class="board" id="board"></section>
+  <div style="flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column">
+    <sc-if value="{{isHome}}" hint-placeholder-val="{{ true }}">
+      <div style="flex: 1 1 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding-bottom: 6px">
+        <button type="button" class="press" onClick="{{tapExplore}}" style="border-radius: 20px; border: 2px solid #2DD4BF; background: #0F2A28; box-shadow: 0 6px 0 #0B7A6E; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #CFFAF3; padding: 8px">
+          <svg width="56" height="56" viewBox="0 0 48 48" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12l12-6 12 6 12-6v30l-12 6-12-6-12 6z" fill="#134440" stroke="#2DD4BF" stroke-width="3"></path><path d="M18 6v30M30 12v30" stroke="#2DD4BF" stroke-width="2"></path><path d="M10 33l6-6 6 4 7-8" stroke="#F5B544" stroke-width="2.5" stroke-dasharray="2 3"></path><path d="M32 15l6 6M38 15l-6 6" stroke="#F2546B" stroke-width="3"></path></svg>
+          <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 18px; font-weight: 700; color: #2DD4BF">Explore</span>
+          <span style="font-size: 10px; color: #8FC9C1">The map</span>
+        </button>
+        <button type="button" class="press" onClick="{{tapStudy}}" style="border-radius: 20px; border: 2px solid #A78BFA; background: #1E1636; box-shadow: 0 6px 0 #5B45A8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #E4DBFF; padding: 8px">
+          <svg width="56" height="56" viewBox="0 0 48 48" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="11" y="12" width="26" height="24" fill="#2B2050" stroke="#A78BFA" stroke-width="3"></rect><rect x="6" y="7" width="36" height="8" rx="4" fill="#3A2C6B" stroke="#A78BFA" stroke-width="3"></rect><rect x="6" y="33" width="36" height="8" rx="4" fill="#3A2C6B" stroke="#A78BFA" stroke-width="3"></rect><path d="M16 21h16M16 26h11" stroke="#D9CCFB" stroke-width="2.5"></path><circle cx="31" cy="27" r="3" fill="#F2546B"></circle></svg>
+          <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 18px; font-weight: 700; color: #C4B5FD">Study</span>
+          <span style="font-size: 10px; color: #B3A8D6">Tomes &amp; words</span>
+        </button>
+        <button type="button" class="press" onClick="{{tapCraft}}" style="border-radius: 20px; border: 2px solid #F5B544; background: #2A1F0C; box-shadow: 0 6px 0 #9A6A1A; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #FFE3B0; padding: 8px">
+          <svg width="56" height="56" viewBox="0 0 48 48" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 38L34 10" stroke="#C08552" stroke-width="3.5"></path><path d="M24 7c7-2 14 1 18 8" stroke="#CBD5E1" stroke-width="3.5"></path><path d="M36 38L14 10" stroke="#C08552" stroke-width="3.5"></path><path d="M9 6l9 2-2 9-7-3z" fill="#CBD5E1" stroke="#94A3B8" stroke-width="2"></path><path d="M22 30h4v4l4 5a3 3 0 0 1-2.5 4.5h-7A3 3 0 0 1 18 39l4-5z" fill="#4ADE80" stroke="#F5B544" stroke-width="2.5"></path></svg>
+          <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 18px; font-weight: 700; color: #F5B544">Profession</span>
+          <span style="font-size: 10px; color: #D9BE8A">Gather &amp; craft</span>
+        </button>
+      </div>
+    </sc-if>
 
-  <script type="module" src="js/game.js"></script>
+    <sc-if value="{{isTraveling}}" hint-placeholder-val="{{ false }}">
+      <div style="flex: 1 1 auto; margin-bottom: 6px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 12px; background: #15121C; border: 1px solid #2E2838; border-radius: 20px; padding: 18px">
+        <span style="font-size: 11px; letter-spacing: 2px; color: #A39CB2">ON THE ROAD</span>
+        <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 22px; font-weight: 700">{{travelTo}}</span>
+        <div style="height: 10px; background: #241F2E; border-radius: 5px; overflow: hidden"><div style="{{travelBar}}"></div></div>
+        <span style="font-size: 12px; color: #A39CB2">{{travelNote}}</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isActivity}}" hint-placeholder-val="{{ false }}">
+      <div style="flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 6px">
+        <div style="{{resultStyle}}">{{result}}</div>
+        <sc-if value="{{isSmith}}" hint-placeholder-val="{{ false }}">
+          <div style="position: relative; height: 12px; background: #2A2014; border-radius: 6px; overflow: hidden">
+            <div style="{{heatStyle}}"></div>
+            <div style="position: absolute; left: 70%; top: 0; width: 20%; height: 100%; box-sizing: border-box; border: 2px solid rgba(255,241,201,0.7); border-radius: 6px"></div>
+          </div>
+        </sc-if>
+        <div style="flex: 1 1 auto; display: flex; gap: 10px">
+          <button type="button" class="press" onClick="{{doAct}}" style="{{actBtnStyle}}">{{actLabel}}</button>
+          <button type="button" class="press" onClick="{{leave}}" style="width: 96px; border-radius: 18px; border: 2px solid #3A3346; background: #1A1622; color: #A39CB2; font-size: 14px; font-weight: 600; box-shadow: 0 6px 0 #07050B">Leave</button>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="{{toastStyle}}">{{toast}}</div>
+
+  <div style="{{fadeStyle}}"><span style="font-family: 'Pixelify Sans', sans-serif; font-size: 26px; font-weight: 700; color: #EDE8F5">{{fadeText}}</span></div>
+
+  <button type="button" onClick="{{close}}" aria-label="Close menu" style="{{scrimStyle}}"></button>
+
+  <div style="{{sheetStyle}}">
+    <div style="width: 44px; height: 5px; border-radius: 3px; background: #3A3346; align-self: center; flex: 0 0 auto"></div>
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 24px; font-weight: 700; color: {{sheetAccent}}">{{sheetTitle}}</span>
+      <button type="button" class="press" onClick="{{close}}" aria-label="Close" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #2E2838; background: #1A1622; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 3px 0 #07050B">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A39CB2" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+
+    <sc-if value="{{isPick}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <p style="margin: 0 0 2px; font-size: 13px; line-height: 1.5; color: #D6D0E2">{{pickIntro}}</p>
+        <sc-for list="{{pickOpts}}" as="o" hint-placeholder-count="3">
+          <button type="button" class="press" onClick="{{o.pick}}" style="{{o.style}}">
+            <span style="display: flex; justify-content: space-between; align-items: baseline; width: 100%; gap: 8px"><span style="font-family: 'Pixelify Sans', sans-serif; font-size: 18px">{{o.title}}</span><span style="font-size: 12px; font-weight: 600; white-space: nowrap">{{o.time}}</span></span>
+            <span style="font-size: 12px; opacity: 0.85">{{o.sub}}</span>
+          </button>
+        </sc-for>
+        <button type="button" class="press" onClick="{{go}}" style="{{goStyle}}">{{goLabel}}</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isBag}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #A39CB2"><span style="color: #F5B544; font-weight: 600">112 gold</span><span>8 / 16 slots</span></div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{items}}" as="it" hint-placeholder-count="16">
+            <button type="button" onClick="{{it.pick}}" aria-label="{{it.label}}" style="{{it.style}}">
+              <span style="font-size: 10.5px; line-height: 1.25">{{it.name}}</span>
+              <span style="font-size: 10px; color: #A39CB2; align-self: flex-end">{{it.qty}}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="background: #1A1622; border: 1px solid #2E2838; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+          <span style="{{selNameStyle}}">{{selName}}</span>
+          <span style="font-size: 11px; letter-spacing: 1.5px; color: #A39CB2">{{selRarity}}</span>
+          <span style="font-size: 13px; line-height: 1.5; color: #D6D0E2">{{selDesc}}</span>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isGear}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; gap: 14px; align-items: stretch">
+          <div style="flex: 0 0 auto; width: 120px; border-radius: 14px; background: #1A1622; border: 1px solid #2E2838; display: flex; align-items: center; justify-content: center; padding: 8px 0">
+            <div style="display: grid; grid-template-columns: repeat(20, 5px); grid-auto-rows: 5px">
+              <sc-for list="{{pixels}}" as="p" hint-placeholder-count="580">
+                <div style="{{p.s}}"></div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+            <sc-for list="{{slots}}" as="sl" hint-placeholder-count="6">
+              <div style="display: flex; flex-direction: column; gap: 1px; padding-bottom: 5px; border-bottom: 1px solid #221D2B">
+                <span style="font-size: 10px; letter-spacing: 1.5px; color: #8A8396">{{sl.slot}}</span>
+                <span style="{{sl.style}}">{{sl.name}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 11px; letter-spacing: 1.5px; color: #A39CB2">CHEST · TAP TO EQUIP</span>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <sc-for list="{{armors}}" as="ar" hint-placeholder-count="3">
+              <button type="button" class="press" onClick="{{ar.pick}}" style="{{ar.style}}"><span>{{ar.name}}</span><span style="font-size: 11px; opacity: 0.8">{{ar.tag}}</span></button>
+            </sc-for>
+          </div>
+        </div>
+        <button type="button" class="press" onClick="{{toggleShield}}" style="{{shieldBtnStyle}}">{{shieldLabel}}</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isStats}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-family: 'Pixelify Sans', sans-serif; font-size: 20px">Wren · Level 7</span><span style="font-size: 12px; color: #A39CB2">Spellblade</span></div>
+          <div style="height: 10px; background: #241F2E; border-radius: 5px; overflow: hidden"><div style="width: 62%; height: 100%; background: #4ADE80; border-radius: 5px"></div></div>
+          <span style="font-size: 11px; color: #A39CB2">1,240 / 2,000 XP to level 8</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <div style="background: #1A1622; border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between"><span style="font-size: 12px; color: #A39CB2">Vitality</span><span style="color: #F2546B; font-weight: 600">34/40</span></div>
+          <div style="background: #1A1622; border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between"><span style="font-size: 12px; color: #A39CB2">Focus</span><span style="color: #A78BFA; font-weight: 600">30/30</span></div>
+          <div style="background: #1A1622; border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between"><span style="font-size: 12px; color: #A39CB2">Might</span><span style="font-weight: 600">14</span></div>
+          <div style="background: #1A1622; border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between"><span style="font-size: 12px; color: #A39CB2">Agility</span><span style="font-weight: 600">11</span></div>
+          <div style="background: #1A1622; border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between"><span style="font-size: 12px; color: #A39CB2">Mind</span><span style="font-weight: 600">16</span></div>
+          <div style="background: #1A1622; border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between"><span style="font-size: 12px; color: #A39CB2">Lore</span><span style="font-weight: 600">9</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 11px; letter-spacing: 1.5px; color: #A39CB2">PROFESSIONS · 3 OF 3</span>
+          <div style="display: flex; flex-direction: column; gap: 4px"><div style="display: flex; justify-content: space-between; font-size: 13px"><span>Smithing</span><span style="color: #F5B544">12</span></div><div style="height: 6px; background: #241F2E; border-radius: 3px"><div style="width: 48%; height: 100%; background: #F5B544; border-radius: 3px"></div></div></div>
+          <div style="display: flex; flex-direction: column; gap: 4px"><div style="display: flex; justify-content: space-between; font-size: 13px"><span>Mining</span><span style="color: #F5B544">8</span></div><div style="height: 6px; background: #241F2E; border-radius: 3px"><div style="width: 32%; height: 100%; background: #F5B544; border-radius: 3px"></div></div></div>
+          <div style="display: flex; flex-direction: column; gap: 4px"><div style="display: flex; justify-content: space-between; font-size: 13px"><span>Alchemy</span><span style="color: #F5B544">3</span></div><div style="height: 6px; background: #241F2E; border-radius: 3px"><div style="width: 12%; height: 100%; background: #F5B544; border-radius: 3px"></div></div></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isQuests}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="background: #1A1622; border: 1px solid #A78BFA; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 0 18px rgba(167,139,250,0.25)">
+          <div style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 10px; letter-spacing: 1.5px; color: #0B0910; background: #A78BFA; border-radius: 6px; padding: 2px 7px; font-weight: 600">NEW</span><span style="font-size: 11px; color: #A39CB2">Ashen Vale</span></div>
+          <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 18px">The Shrine's Missing Word</span>
+          <span style="font-size: 13px; line-height: 1.5; color: #D6D0E2">The carvings at Mossgate end mid-sentence. Someone chiseled the last word away.</span>
+        </div>
+        <div style="background: #1A1622; border: 1px solid #2E2838; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 10px; letter-spacing: 1.5px; color: #0B0910; background: #F2546B; border-radius: 6px; padding: 2px 7px; font-weight: 600">NEW</span><span style="font-size: 11px; color: #A39CB2">Ashen Vale</span></div>
+          <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 18px">Trouble at the Mill</span>
+          <span style="font-size: 13px; line-height: 1.5; color: #D6D0E2">Something heavy has been crossing the river at night.</span>
+          <div style="display: flex; gap: 4px"><span style="width: 24px; height: 6px; border-radius: 3px; background: #F2546B"></span><span style="width: 24px; height: 6px; border-radius: 3px; background: #2E2838"></span><span style="width: 24px; height: 6px; border-radius: 3px; background: #2E2838"></span></div>
+        </div>
+        <div style="background: #1A1622; border: 1px dashed #6B5A2E; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 10px; letter-spacing: 1.5px; color: #F5B544; font-weight: 600">RUMOR</span><span style="font-size: 11px; color: #A39CB2">Ironcrown Peaks</span></div>
+          <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 18px">A Hoard Beneath Kesh Pass</span>
+          <span style="font-size: 13px; line-height: 1.5; color: #D6D0E2">A drunk miner swears the mountain hums when the moon is full.</span>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="{{tomeRoot}}">
+    <div style="{{tomeScrim}}"></div>
+
+    <div class="{{stageCls}}" style="{{stageStyle}}">
+      <img class="px {{spreadCls}}" src="assets/tome/tome-spread.png" alt="" style="{{spreadStyle}}">
+      <sc-if value="{{leavesOn}}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{leaves}}" as="lf" hint-placeholder-count="6">
+          <img class="px leaf" src="assets/tome/tome-leaf.png" alt="" style="{{lf.s}}">
+        </sc-for>
+      </sc-if>
+      <div class="runeGlow" style="{{glowStyle}}"></div>
+      <img class="px {{coverCls}}" src="assets/tome/tome-cover.png" alt="A burgundy leather tome with a glowing rune circle" style="{{coverStyle}}">
+    </div>
+
+    <div class="{{wrapCls}}" style="{{wrapStyle}}">
+
+      <div class="parch" style="{{gameStyle}}">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+          <button type="button" class="inkbtn" onClick="{{toContents}}" aria-label="Back to contents" style="height: 44px; padding: 0 12px 0 8px; border-radius: 10px; border: 2px solid rgba(122,31,43,0.5); background: rgba(255,248,232,0.4); display: flex; align-items: center; gap: 6px; color: #7A1F2B; font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; letter-spacing: 1px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A1F2B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10v18l-5-4-5 4z"></path></svg>
+            Contents
+          </button>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 0">
+            <span style="font-family: 'Cinzel Decorative', serif; font-size: 22px; font-weight: 700; color: #3B2414; line-height: 1.1">{{modeTitle}}</span>
+            <span style="font-family: 'IM Fell English', serif; font-size: 14px; font-style: italic; color: #5E4128">Page {{pageNum}}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px">
+            <span style="font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: #7A1F2B; white-space: nowrap">{{sxp}}</span>
+            <button type="button" class="inkbtn" onClick="{{closeTome}}" aria-label="Close the tome" style="width: 44px; height: 44px; border-radius: 10px; border: 2px solid rgba(59,36,20,0.4); background: rgba(255,248,232,0.4); display: flex; align-items: center; justify-content: center; padding: 0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B2414" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-family: 'IM Fell English', serif; font-size: 15px; color: #5E4128"><span style="font-style: italic">{{modeHint}}</span><span style="{{streakStyle}}">{{streakText}}</span></div>
+        <div class="{{pageClass}}" style="position: relative; height: 318px; flex: 0 0 auto; box-sizing: border-box; background: rgba(255,250,236,0.38); border: 2px solid rgba(122,84,40,0.45); border-radius: 6px; padding: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; box-shadow: inset 0 0 26px rgba(122,84,40,0.25)">
+          <sc-for list="{{pageSlots}}" as="sl" hint-placeholder-count="4">
+            <div style="{{sl.box}}">
+              <div class="{{sl.cls}}" style="{{sl.svgStyle}}"><svg width="64" height="64" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{sl.frame}}" stroke="{{sl.color}}" stroke-width="4" stroke-opacity="0.5"></path><path d="{{sl.glyph}}" stroke="{{sl.color}}" stroke-width="6"></path></svg></div>
+              <span style="font-family: 'IM Fell English', serif; font-size: 15px; color: #5E4128; min-height: 18px">{{sl.top}}</span>
+              <span style="{{sl.nameStyle}}">{{sl.bottom}}</span>
+            </div>
+          </sc-for>
+          <sc-if value="{{pageDone}}" hint-placeholder-val="{{ false }}">
+            <div class="parch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; box-sizing: border-box; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 20px; text-align: center">
+              <span style="font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; color: #5E4128">PAGE COMPLETE</span>
+              <span style="font-family: 'Cinzel Decorative', serif; font-size: 40px; font-weight: 700; color: #7A1F2B">{{tallyXp}}</span>
+              <span style="font-family: 'IM Fell English', serif; font-size: 15px; line-height: 1.4; color: #3B2414">{{tallyNote}}</span>
+              <sc-if value="{{hasMargin}}" hint-placeholder-val="{{ false }}">
+                <span style="font-family: 'IM Fell English', serif; font-size: 15px; line-height: 1.4; font-style: italic; color: #4A2E18; border: 2px dashed rgba(122,84,40,0.55); border-radius: 6px; padding: 8px 10px">{{margin}}</span>
+              </sc-if>
+              <sc-if value="{{hasDawn}}" hint-placeholder-val="{{ false }}">
+                <span class="glowin" style="font-family: 'IM Fell English', serif; font-size: 16px; line-height: 1.4; color: #17435F; border: 2px solid #1F5C8A; border-radius: 6px; padding: 8px 10px; background: rgba(31,92,138,0.08)">{{dawnText}}</span>
+              </sc-if>
+              <button type="button" class="press" onClick="{{doneAction}}" style="{{doneBtnStyle}}">{{doneLabel}}</button>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{tiles}}" as="t" hint-placeholder-count="8">
+            <button type="button" class="{{t.cls}}" onClick="{{t.pick}}" aria-label="{{t.name}}" style="{{t.style}}">
+              <sc-if value="{{t.showRune}}" hint-placeholder-val="{{ true }}">
+                <svg width="46" height="46" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.frame}}" stroke="{{t.color}}" stroke-width="4" stroke-opacity="0.5"></path><path d="{{t.glyph}}" stroke="{{t.color}}" stroke-width="7"></path></svg>
+              </sc-if>
+              <sc-if value="{{t.showName}}" hint-placeholder-val="{{ false }}">
+                <span>{{t.name}}</span>
+              </sc-if>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; border-top: 2px solid rgba(122,84,40,0.35); padding: 10px 2px 0">
+          <span style="font-family: 'Cinzel Decorative', serif; font-size: 20px; font-weight: 700; letter-spacing: 3px; color: #7A1F2B; flex: 0 0 auto">{{inkLetters}}</span>
+          <div style="flex: 1 1 auto; display: flex; flex-direction: column; gap: 6px">
+            <span style="font-family: 'IM Fell English', serif; font-size: 14px; font-style: italic; color: #5E4128">Unknown word · ink {{ink}}%</span>
+            <div style="height: 8px; background: rgba(122,84,40,0.2); border-radius: 4px; overflow: hidden"><div style="{{inkBar}}"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="{{menuCls}}" style="{{menuStyle}}">
+        <img class="px" src="assets/tome/corner.png" alt="" style="position: absolute; left: 10px; top: 10px; width: 84px; height: 84px">
+        <img class="px" src="assets/tome/corner.png" alt="" style="position: absolute; right: 10px; top: 10px; width: 84px; height: 84px; transform: scaleX(-1)">
+        <img class="px" src="assets/tome/corner.png" alt="" style="position: absolute; left: 10px; bottom: 10px; width: 84px; height: 84px; transform: scaleY(-1)">
+        <img class="px" src="assets/tome/corner.png" alt="" style="position: absolute; right: 10px; bottom: 10px; width: 84px; height: 84px; transform: scale(-1, -1)">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding-top: 30px">
+          <span style="font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; color: #5E4128">{{studyPlace}}</span>
+          <span style="font-family: 'Cinzel Decorative', serif; font-size: 36px; font-weight: 700; color: #7A1F2B; line-height: 1.1">Runic Primer</span>
+          <span style="font-family: 'IM Fell English', serif; font-size: 17px; font-style: italic; color: #4A2E18">Choose a lesson, scholar.</span>
+          <svg width="220" height="18" viewBox="0 0 220 18" fill="none" aria-hidden="true" style="margin-top: 6px"><path d="M4 9H92M128 9H216" stroke="#7A5428" stroke-width="2" stroke-linecap="round"></path><path d="M110 2L117 9L110 16L103 9Z" fill="#7A1F2B"></path><circle cx="96" cy="9" r="2.5" fill="#7A5428"></circle><circle cx="124" cy="9" r="2.5" fill="#7A5428"></circle></svg>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 0 6px">
+          <sc-for list="{{menuItems}}" as="mi" hint-placeholder-count="4">
+            <button type="button" class="inkbtn" onClick="{{mi.pick}}" style="{{mi.style}}">
+              <img class="px" src="{{mi.icon}}" alt="" style="width: 60px; height: 60px; flex: 0 0 auto">
+              <span style="flex: 1 1 auto; display: flex; flex-direction: column; gap: 2px; text-align: left">
+                <span style="{{mi.nameStyle}}">{{mi.name}}</span>
+                <span style="font-family: 'IM Fell English', serif; font-size: 15px; font-style: italic; color: #5E4128; line-height: 1.3">{{mi.desc}}</span>
+              </span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A5428" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding-bottom: 34px; font-family: 'IM Fell English', serif; color: #4A2E18">
+          <span style="font-size: 16px">Page {{pageNum}} · {{sxp}} this visit</span>
+          <span style="font-size: 14px; font-style: italic; color: #5E4128">Ink toward an unknown word: {{ink}}%</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="parch" style="{{revealStyle}}">
+    <span style="font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; color: #5E4128">{{revealKicker}}</span>
+    <span style="font-family: 'Cinzel Decorative', serif; font-size: 28px; font-weight: 700; color: #7A1F2B">{{revealTitle}}</span>
+    <span style="font-family: 'IM Fell English', serif; font-size: 16px; font-style: italic; color: #4A2E18; text-align: center">{{revealSub}}</span>
+    <div style="{{boardStyle}}">
+      <sc-for list="{{pieces}}" as="pc" hint-placeholder-count="9">
+        <button type="button" onClick="{{pc.pick}}" aria-label="{{pc.label}}" style="{{pc.style}}">
+          <div style="{{pc.inner}}">
+            <svg width="100%" height="100%" viewBox="{{pc.vb}}" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14 H86 V86 H14 Z" stroke="{{pieceStroke}}" stroke-width="2.4" stroke-opacity="0.6"></path><path d="M30 50 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 M58 50 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 M46 50 H54" transform="translate(50 50) scale(1.5) translate(-50 -50)" stroke="{{pieceStroke}}" stroke-width="2.6"></path></svg>
+          </div>
+        </button>
+      </sc-for>
+    </div>
+    <span style="font-family: 'IM Fell English', serif; font-size: 15px; color: #5E4128">{{turnsText}}</span>
+    <sc-if value="{{isSolved}}" hint-placeholder-val="{{ false }}">
+      <div style="font-family: 'Cinzel Decorative', serif; font-size: 48px; font-weight: 700; letter-spacing: 14px; color: #1F5C8A; text-shadow: 0 0 14px rgba(31,92,138,0.35); line-height: 1">
+        <sc-for list="{{letters}}" as="lt" hint-placeholder-count="4"><span style="{{lt.style}}">{{lt.c}}</span></sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{showCard}}" hint-placeholder-val="{{ false }}">
+      <div class="glowin" style="width: 100%; box-sizing: border-box; background: rgba(255,250,236,0.55); border: 2px solid #1F5C8A; border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; color: #3B2414">
+        <div style="display: flex; justify-content: space-between"><span style="font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; color: #1F5C8A">ADDED TO GRIMOIRE</span><span style="font-family: 'IM Fell English', serif; font-size: 14px; color: #5E4128">Form rune</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-family: 'Cinzel Decorative', serif; font-size: 22px; font-weight: 700">Tele</span><span style="font-family: 'IM Fell English', serif; font-size: 15px; color: #5E4128">Meaning: ? ? ?</span></div>
+        <span style="font-family: 'IM Fell English', serif; font-size: 16px; line-height: 1.4; font-style: italic; color: #3B2414">"It pulls at distance, as if the far side of the room were only a step away."</span>
+        <span style="font-family: 'IM Fell English', serif; font-size: 14px; line-height: 1.4; color: #5E4128">Its meaning reveals itself when you cast it, or as you meet it in your studies.</span>
+      </div>
+      <button type="button" class="press" onClick="{{finishReveal}}" style="width: 100%; min-height: 52px; border-radius: 14px; border: none; background: #1F5C8A; color: #FFF8E7; font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; box-shadow: 0 5px 0 #123A59">Return to study</button>
+    </sc-if>
+  </div>
+
+</div>
+  </template>
+
+  <script type="module" src="screens/primary.js"></script>
 </body>
 </html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#14111f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Spell Game</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="hud">
+    <div class="bar"><span>Mana</span><div class="meter"><i id="mana"></i></div><b id="manaNum">100</b></div>
+    <div class="bar"><span>Health</span><div class="meter hp"><i id="hp"></i></div><b id="hpNum">100</b></div>
+    <div class="chips" id="playerChips"></div>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="foe">
+      <div class="foe-head"><b id="foeName">Enemy</b><span id="foeLevel"></span></div>
+      <div class="meter foe-hp"><i id="foeHp"></i></div>
+      <div class="foe-meta"><span id="foeWeak"></span><span id="foeHpNum"></span></div>
+      <div class="chips" id="foeChips"></div>
+    </div>
+    <div class="arena">
+      <div class="target" id="target" aria-hidden="true"></div>
+      <div class="burst" id="burst"></div>
+      <div class="floats" id="floats"></div>
+    </div>
+    <div class="intent"><span id="intentText"></span><div class="meter"><i id="intent"></i></div></div>
+    <div class="overlay" id="overlay" hidden>
+      <p class="title" id="overlayTitle"></p>
+      <p class="sub" id="overlaySub"></p>
+      <button class="cast" id="overlayBtn">Try again</button>
+    </div>
+    <div class="result" id="result">
+      <p class="title">Tap runes to build a spell</p>
+      <p class="sub">1 to 3 words, in any order. Then cast.</p>
+    </div>
+  </main>
+
+  <section class="spellbar">
+    <div class="slots" id="slots"></div>
+    <div class="actions">
+      <button id="clear" class="ghost">Clear</button>
+      <button id="cast" class="cast" disabled>Cast</button>
+    </div>
+    <div class="cast-progress"><i id="castProgress"></i></div>
+  </section>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="S" class="on">Sources</button>
+    <button data-tab="F">Forms</button>
+    <button data-tab="M">Modifiers</button>
+    <button data-tab="G">Grimoire <span id="found">0</span></button>
+  </nav>
+
+  <section class="board" id="board"></section>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>

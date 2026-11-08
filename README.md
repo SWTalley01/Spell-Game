@@ -4,27 +4,31 @@ A mobile spell-casting game where you build spells from Latin-rooted words. Buil
 
 ## Play
 
-Open `index.html` through any web server, or the GitHub Pages link once it's on. It's a plain HTML/JS page with no build step.
+Open `index.html` through any web server, or the GitHub Pages link. Plain HTML/JS, no build step.
 
-Tap rune tiles to fill the spell bar (1 to 3 words, any order), then **Cast**.
+**Primary screen** (`index.html`): location card with day clock, the character scene, and three actions:
+- **Explore**: placeholder for the map.
+- **Study**: pick a library, walk there (time passes), then open a tome. The tome arrives, opens, flips and dives into the Runic Primer. Lessons: **Copy** (match faded runes), **Recall** (from memory), **Read** (name the rune). Streaks multiply XP, each page adds ink toward an unknown word, and a full word unlocks a rune-turning puzzle that reveals it (TELE).
+- **Profession**: Smithing (timed hammer strikes), Mining, Alchemy.
 
-- **Source** (gold circle): what the spell is made of
-- **Form** (blue square): what it does
-- **Modifier** (violet diamond): how it's tuned. Only fits in a 3-word spell.
+Plus Bag, Gear, Stats and Quests sheets. Tap the location card to preview other regions.
 
-Opposites cancel, wrong combinations fizzle with a hint, and hand-made combos are recorded in the Grimoire as discoveries.
-
-**Battle:** five enemies in a loop (Ember Imp, Mud Golem, Shade, Storm Wisp, Bone Warden), getting tougher each round. Each has a telegraphed attack, an element, and weaknesses you discover by hitting them (or casting Inven). Spells deal damage, heal, shield, stun, slow, blind, silence casters, break armor, summon allies and more. A shield made of the enemy's element blocks twice as well.
+**Spell practice** (`practice.html`): the earlier spell-bar prototype. Kept as a starting point for a practice screen; its battle mode is not the planned combat flow.
 
 ## Layout
 
 | Path | What it is |
 | --- | --- |
-| `index.html`, `css/style.css` | The page |
+| `index.html` | Primary screen markup (template format, see `js/dc-lite.js`) |
+| `screens/primary.js` | Primary screen + tome logic |
+| `css/primary.css`, `css/shell.css` | Animations and styles; fitting the 390 × 844 frame to any phone |
+| `js/dc-lite.js` | Small runtime for the prototype template format |
+| `assets/tome/` | Tome art. **Currently stand-ins**: replace with the real images, same file names |
+| `practice.html`, `css/style.css` | Spell practice page |
 | `js/lexicon.js` | All spell data: roots, opposites, secret combos, costs |
 | `js/spells.js` | Spell grammar (pure logic, no DOM) |
 | `js/combat.js` | What spells do in battle, enemies, battle rules |
-| `js/game.js` | UI, mana, casting, grimoire |
+| `js/game.js` | Practice page UI, mana, casting, grimoire |
 | `tests/` | Rule tests: `node tests/spells.test.mjs && node tests/combat.test.mjs` |
 | `docs/` | Design docs (lexicon, rune script) |
 
@@ -32,4 +36,6 @@ The design source of truth lives in the "Mobile Game" Claude project; `docs/` ho
 
 ## Status
 
-First playable prototype. Runes are placeholder frames (shape and color only) until the real rune art is drawn.
+- Primary screen and tome study ported from the "Tome Prototype" design canvas (2026-11-08).
+- Tome images in `assets/tome/` are stand-ins until the originals are added: `tome-cover.png`, `tome-spread.png`, `tome-leaf.png`, `parchment.png`, `corner.png`, `icon-copy.png`, `icon-recall.png`, `icon-read.png`, `icon-close.png`.
+- Combat is to be redesigned.

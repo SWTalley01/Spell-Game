@@ -1,0 +1,5 @@
+/* Fits the 390 × 844 game frame to any screen, keeping its proportions. */
+html, body { margin: 0; height: 100%; background: #0B0910; overflow: hidden; }
+body { display: flex; align-items: center; justify-content: center; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+#fit { position: relative; width: calc(390px * var(--s, 1)); height: calc(844px * var(--s, 1)); }
+#frame { position: absolute; left: 0; top: 0; width: 390px; height: 844px; transform: scale(var(--s, 1)); transform-origin: 0 0; }
