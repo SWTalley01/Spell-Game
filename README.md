@@ -23,7 +23,7 @@ Plus Bag, Gear, Stats and Quests sheets. Tap the location card to preview other 
 | `screens/primary.js` | Primary screen + tome logic |
 | `css/primary.css`, `css/shell.css` | Animations and styles; fitting the 390 × 844 frame to any phone |
 | `js/dc-lite.js` | Small runtime for the prototype template format |
-| `assets/tome/` | Tome art (cover, spread, parchment, corner ornament, lesson icons; the turning leaf is a stand-in) |
+| `assets/tome/` | Tome art (cover, spread, turning leaf, parchment, corner ornament, lesson icons) |
 | `practice.html`, `css/style.css` | Spell practice page |
 | `js/lexicon.js` | All spell data: roots, opposites, secret combos, costs |
 | `js/spells.js` | Spell grammar (pure logic, no DOM) |
@@ -37,5 +37,5 @@ The design source of truth lives in the "Mobile Game" Claude project; `docs/` ho
 ## Status
 
 - Primary screen and tome study ported from the "Tome Prototype" design canvas (2026-11-08).
-- Tome art is the original generated art, except `tome-leaf.png` (the turning page), which is still a stand-in.
+- Tome art is the original generated art. See-through gaps inside the cover, open book and eye icon are filled in; the corner ornament is flipped to sit in the top-left like the layout expects. `tome-leaf.png` (the turning page, with scribbled handwriting) is drawn by hand.
 - Combat is to be redesigned.

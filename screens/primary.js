@@ -214,9 +214,32 @@ class Component extends DCLogic {
     }
   }
   nextPage() {
+    // Turn the whole page: a copy of the finished page lifts from the right edge and
+    // swings over the spine, revealing the fresh page already waiting underneath.
+    if (this.state.flipping) return;
+    const page = document.querySelector('[data-page="game"]');
+    if (page) {
+      const r = page.getBoundingClientRect();
+      const frame = document.getElementById('frame');
+      const box = frame.getBoundingClientRect();
+      const s = box.width / 390;
+      const leaf = page.cloneNode(true);
+      leaf.removeAttribute('data-page');
+      leaf.classList.add('turningPage');
+      leaf.style.left = (r.left - box.left) / s + 'px';
+      leaf.style.top = (r.top - box.top) / s + 'px';
+      leaf.style.width = r.width / s + 'px';
+      leaf.style.height = r.height / s + 'px';
+      const shade = document.createElement('div');
+      shade.className = 'turnShade';
+      leaf.appendChild(shade);
+      frame.appendChild(leaf);
+      setTimeout(() => leaf.remove(), 1000);
+    }
     this.setState({ flipping: true });
-    setTimeout(() => { this.newPage(); this.setState({ pageNum: this.state.pageNum + 1 }); }, 260);
-    setTimeout(() => this.setState({ flipping: false }), 560);
+    this.newPage();
+    this.setState({ pageNum: this.state.pageNum + 1 });
+    setTimeout(() => this.setState({ flipping: false }), 1000);
   }
   setMode(m) {
     this.setState({ mode: m, streak: 0 });
@@ -316,7 +339,7 @@ class Component extends DCLogic {
       modeHint: { copy: 'Match each faded rune.', recall: 'From memory: find each word’s rune.', read: 'Read each rune: pick its name.' }[s.mode],
       streakText: 'Streak ' + s.streak + ' · ×' + mult,
       streakStyle: 'font-family:Cinzel, serif;font-size:13px;font-weight:700;white-space:nowrap;' + (mult > 1 ? 'color:#7A1F2B;' : 'color:#5E4128;'),
-      pageSlots: slots, tiles: tiles, pageClass: s.flipping ? 'turn' : '',
+      pageSlots: slots, tiles: tiles, pageClass: '',
       pageDone: s.done, tallyXp: '+' + s.pageXp + ' XP',
       tallyNote: s.ink >= 100 ? (s.learned ? 'Another word is complete. Its puzzle comes in a later build.' : 'The unknown word is complete. Decipher it now.') : 'Ink gathered toward an unknown word.',
       hasMargin: !!s.margin, margin: s.margin,
